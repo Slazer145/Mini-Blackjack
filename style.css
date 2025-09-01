@@ -1,0 +1,93 @@
+body { 
+    font-family: Arial, sans-serif; 
+    margin: 20px;
+    background-image: linear-gradient(to bottom right, rgb(26, 194, 26) , rgb(11, 54, 11));
+}
+
+.container { 
+    display: flex; 
+    flex-flow: column wrap; 
+    gap: 20px;
+    align-items: center;
+    width: 70vw;
+    height: 90vh;
+}
+
+#result{
+    background-color: rgb(57, 211, 254);
+    padding: 10px;
+    border-radius: 15px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 10px 1px 5px;
+    font-weight: 600;
+}
+.game-section { 
+    border: 1px solid #333; 
+    border-radius: 8px;
+    padding: 16px; 
+    min-width: 220px; 
+    min-height: 100px; 
+    background: #f8f8f8;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 5px 5px 10px;
+    text-shadow: #333 1px 0;
+}
+
+.game-section > h2{
+    width: 100%;
+    text-align: center;
+
+}
+#bet-button{
+    border-radius: 50px;
+}
+#dealer-cards { 
+    background: #e3e3e3;
+    width: 100%; 
+}
+
+#player-cards { 
+    background: #d3f8d3;
+    width: 100%;
+}
+
+#player-balance { 
+    background: #f8e3d3;
+    width: 100%; 
+}
+
+#game-history { 
+    background: #e3d3f8;
+    flex: 1 1 100%; 
+    min-height: 120px; 
+}
+
+#betting{
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+#betting > *{
+    width: 15%
+}
+
+#betting > button{
+    border-radius: 10px;
+}
+
+h2 { 
+    margin: 0 auto 0px auto;
+}
+
+.hidden{
+    display: none !important;
+}
+
+#round-end{
+    cursor: pointer;
+}
