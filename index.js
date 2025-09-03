@@ -525,6 +525,7 @@ betButton.addEventListener("click", () => {
     };
 
     function shoot() {
+      playConfetti();
       confetti({
         ...defaults,
         particleCount: 40,
@@ -624,29 +625,37 @@ function resetRound(){
 }
 
 function playChipsSound(){
-  const audio = new Audio('poker_chips.mp3'); 
+  const audio = new Audio('./assets/sounds/poker_chips.mp3'); 
   audio.playbackRate = 4; 
   audio.play();
 }
 
 function playCardShuffling(){
-  const audio = new Audio('card_shuffling.mp3'); 
+  const audio = new Audio('./assets/sounds/card_shuffling.mp3'); 
   audio.playbackRate = 4; 
   audio.play();
+}
 
-}
 function playCardDealing(){
-  const audio = new Audio('card_dealing.mp3'); 
+  const audio = new Audio('./assets/sounds/card_dealing.mp3'); 
   audio.playbackRate = 4; 
   audio.play();
 }
+
 function playZeroBalance(){
-  const audio = new Audio('lost.mp3'); 
+  const audio = new Audio('./assets/sounds/lost.mp3'); 
   audio.playbackRate = 4; 
   audio.play();
 }
+
 function playJackpot(){
-  const audio = new Audio('jackpot.mp3'); 
+  const audio = new Audio('./assets/sounds/jackpot.mp3'); 
+  audio.playbackRate = 1.5; 
+  audio.play();
+}
+
+function playConfetti(){
+  const audio = new Audio('./assets/sounds/confetti.mp3'); 
   audio.playbackRate = 1.5; 
   audio.play();
 }
