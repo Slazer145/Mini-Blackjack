@@ -328,7 +328,10 @@ const betButton = document.getElementById("bet-button"),
   dValue = document.getElementById("dealer-value"),
   pValue = document.getElementById("player-value"),
   result = document.getElementById("result"),
-  roundReset = document.getElementById("round-end");
+  roundReset = document.getElementById("round-end"),
+  pCardContainer = document.getElementById("pcard-container"),
+  dCardContainer = document.getElementById("dcard-container"),
+  gameHistory = document.getElementById("game-history");
 
 let card = {},
   playerCards = [],
@@ -336,7 +339,7 @@ let card = {},
   pHandValue,
   dHandValue,
   balance = 1000,
-  chipsWon,
+  chipsWon = 0,
   nextRound = document.createElement("button");
 
 nextRound.innerHTML = `⏭ NEXT ROUND`;
@@ -344,6 +347,7 @@ nextRound.style.backgroundImage = "linear-gradient(to right, green , yellow)";
 nextRound.style.height = "40px";
 nextRound.classList.add("hidden");
 playerBalance.appendChild(nextRound);
+nextRound.addEventListener("click", () => resetRound());
 
 bet10.addEventListener("click", () => {
   betInput.value = 10;
@@ -366,70 +370,29 @@ bet250.addEventListener("click", () => {
 });
 
 betButton.addEventListener("click", () => {
-  balance -= betInput.value;
+  let bet = Math.min(betInput.value, balance);
+  balance -= bet;
+  betInput.value = bet;
+  playChipsSound();
   balanceHeading.innerHTML = `Balance : $${balance}`;
-  const dealerCardValue = document.createElement("p");
-  const playerCardValue = document.createElement("p");
-  playerCardValue.style.width = "100%";
-  playerCardValue.style.textAlign = "center";
-  playerCardValue.style.margin = "0";
-  dealerCardValue.style.width = "100%";
-  dealerCardValue.style.textAlign = "center";
-  dealerCardValue.style.margin = "0";
-  const dealerCard1 = document.createElement("div"); //Dealer card 1
-  dealerCard1.style.height = "100px";
-  dealerCard1.style.width = "75px";
-  dealerCard1.style.fontSize = "1.5rem";
-  dealerCard1.style.backgroundColor = "white";
-  dealerCard1.style.border = "1px black solid";
-  dealerCard1.style.display = "flex";
-  dealerCard1.style.justifyContent = "center";
-  dealerCard1.style.alignItems = "center";
-  dealerCard1.style.borderRadius = "5px";
-  dealer.appendChild(dealerCard1);
-  card = cardDisplay(dealerCard1);
+  const dealerCard1 = cardDisplay(); //Dealer card 1
+  dCardContainer.appendChild(dealerCard1);
+  card = cardGenerator(dealerCard1);
   dealerCards.push(card);
-  const dealerCard2 = document.createElement("div"); //Dealer card 2
-  dealerCard2.style.height = "100px";
-  dealerCard2.style.width = "75px";
-  dealerCard2.style.fontSize = "1.5rem";
+  const dealerCard2 = cardDisplay(); //Dealer card 2
   dealerCard2.style.backgroundColor = "black";
-  dealerCard2.style.border = "1px black solid";
-  dealerCard2.style.display = "flex";
-  dealerCard2.style.justifyContent = "center";
-  dealerCard2.style.alignItems = "center";
-  dealerCard2.style.borderRadius = "5px";
-  dealer.appendChild(dealerCard2);
-  const playerCard1 = document.createElement("div");    //Player card 1
-  playerCard1.style.height = "100px";
-  playerCard1.style.width = "75px";
-  playerCard1.style.fontSize = "1.5rem";
-  playerCard1.style.backgroundColor = "white";
-  playerCard1.style.border = "1px black solid";
-  playerCard1.style.display = "flex";
-  playerCard1.style.justifyContent = "center";
-  playerCard1.style.alignItems = "center";
-  playerCard1.style.borderRadius = "5px";
-  player.appendChild(playerCard1);
-  card = cardDisplay(playerCard1);
+  dCardContainer.appendChild(dealerCard2);
+  const playerCard1 = cardDisplay();    //Player card 1
+  pCardContainer.appendChild(playerCard1);
+  card = cardGenerator(playerCard1);
   playerCards.push(card);
-  const playerCard2 = document.createElement("div");    //Player card 2
-  playerCard2.style.height = "100px";
-  playerCard2.style.width = "75px";
-  playerCard2.style.fontSize = "1.5rem";
-  playerCard2.style.backgroundColor = "white";
-  playerCard2.style.border = "1px black solid";
-  playerCard2.style.display = "flex";
-  playerCard2.style.justifyContent = "center";
-  playerCard2.style.alignItems = "center";
-  playerCard2.style.borderRadius = "5px";
-  player.appendChild(playerCard2);
-  card = cardDisplay(playerCard2);
+  const playerCard2 = cardDisplay();    //Player card 2
+  pCardContainer.appendChild(playerCard2);
+  card = cardGenerator(playerCard2);
   playerCards.push(card);
   bettingSection.classList.toggle("hidden");    //Hiding betting options
   pHandValue = cardValue(playerCards);
-  playerCardValue.innerHTML = `Hand value : ${pHandValue}`;
-  pValue.appendChild(playerCardValue);
+  pValue.innerHTML = `Hand value : ${pHandValue}`;
   if (pHandValue !== 21) {
     //HIT and STAND scenario
     const hit = document.createElement("button");
@@ -439,6 +402,7 @@ betButton.addEventListener("click", () => {
     playerBalance.appendChild(hit);
     playerBalance.appendChild(stand);
     hit.addEventListener("click", () => {
+      playCardDealing();
       const playerCard = document.createElement("div");
       playerCard.style.height = "100px";
       playerCard.style.width = "75px";
@@ -449,51 +413,39 @@ betButton.addEventListener("click", () => {
       playerCard.style.justifyContent = "center";
       playerCard.style.alignItems = "center";
       playerCard.style.borderRadius = "5px";
-      player.appendChild(playerCard);
-      card = cardDisplay(playerCard);
+      pCardContainer.appendChild(playerCard);
+      card = cardGenerator(playerCard);
       playerCards.push(card);
       pHandValue = cardValue(playerCards);
-      playerCardValue.innerHTML = `Hand value : ${pHandValue}`;
+      pValue.innerHTML = `Hand value : ${pHandValue}`;
       if (pHandValue > 21) {
         //Lose condition #1 (Player Bust)
-        playerCardValue.innerHTML = `BUST`;
+        pValue.innerHTML = `BUST`;
         setTimeout(() => {
           result.innerHTML = `YOU LOSE`;
           hit.remove();
           stand.remove();
           nextRound.classList.remove("hidden");
-          nextRound.addEventListener("click", () =>{
-            resetRound(dealerCardValue, playerCardValue, dealerCard1, dealerCard2, playerCard1, playerCard2);
-          });
         }, 500);
       }
     });
     stand.addEventListener("click", () => {
+      playCardDealing();
       dealerCard2.style.backgroundColor = "white";
-      card = cardDisplay(dealerCard2);
+      card = cardGenerator(dealerCard2);
       dealerCards.push(card);
       dHandValue = cardValue(dealerCards);
       while (dHandValue <= 16) {
-        const dealerCard = document.createElement("div");
-        dealerCard.style.height = "100px";
-        dealerCard.style.width = "75px";
-        dealerCard.style.fontSize = "1.5rem";
-        dealerCard.style.backgroundColor = "white";
-        dealerCard.style.border = "1px black solid";
-        dealerCard.style.display = "flex";
-        dealerCard.style.justifyContent = "center";
-        dealerCard.style.alignItems = "center";
-        dealerCard.style.borderRadius = "5px";
-        dealer.appendChild(dealerCard);
-        card = cardDisplay(dealerCard);
+        const dealerCard = cardDisplay();
+        dCardContainer.appendChild(dealerCard);
+        card = cardGenerator(dealerCard);
         dealerCards.push(card);
         dHandValue = cardValue(dealerCards);
       }
-      dealerCardValue.innerHTML = `Hand value : ${dHandValue}`;
-      dValue.appendChild(dealerCardValue);
+      dValue.innerHTML = `Hand value : ${dHandValue}`;
       if (dHandValue > 21) {
         //Win condition #1 (Dealer Bust)
-        dealerCardValue.innerHTML = `DEALER BUST!!!`;
+        dValue.innerHTML = `DEALER BUST!!!`;
         chipsWon = betInput.valueAsNumber * 2;
         balance += chipsWon;
         confetti({
@@ -507,9 +459,6 @@ betButton.addEventListener("click", () => {
           hit.remove();
           stand.remove();
           nextRound.classList.remove("hidden");
-          nextRound.addEventListener("click", () =>{
-            resetRound(dealerCardValue, playerCardValue, dealerCard1, dealerCard2, playerCard1, playerCard2);
-          });
         }, 500);
         
       } else if (dHandValue < pHandValue) {
@@ -527,9 +476,6 @@ betButton.addEventListener("click", () => {
           hit.remove();
           stand.remove();
           nextRound.classList.remove("hidden");
-          nextRound.addEventListener("click", () =>{
-            resetRound(dealerCardValue, playerCardValue, dealerCard1, dealerCard2, playerCard1, playerCard2);
-          });
         }, 500);
       } else if (dHandValue > pHandValue) {
         //Lose condition #2 (Point difference)
@@ -538,9 +484,6 @@ betButton.addEventListener("click", () => {
           hit.remove();
           stand.remove();
           nextRound.classList.remove("hidden");
-          nextRound.addEventListener("click", () =>{
-            resetRound(dealerCardValue, playerCardValue, dealerCard1, dealerCard2, playerCard1, playerCard2);
-          });
         }, 500);
       } else {
         //Draw condition (Push)
@@ -552,15 +495,13 @@ betButton.addEventListener("click", () => {
           hit.remove();
           stand.remove();
           nextRound.classList.remove("hidden");
-          nextRound.addEventListener("click", () =>{
-            resetRound(dealerCardValue, playerCardValue, dealerCard1, dealerCard2, playerCard1, playerCard2);
-          });
         }, 500);
       }
     });
   } else {
     //Win condition #3 (Natural Blackjack)
     const blackjack = document.createElement("p");
+    playJackpot();
     blackjack.innerHTML = `BLACKJACK!!!`;
     blackjack.style.fontSize = "2rem";
     blackjack.style.fontWeight = "600";
@@ -572,9 +513,6 @@ betButton.addEventListener("click", () => {
       result.innerHTML = `YOU WON : $${chipsWon}`;
       blackjack.remove();
       nextRound.classList.remove("hidden");
-      nextRound.addEventListener("click", () =>{
-        resetRound(dealerCardValue, playerCardValue, dealerCard1, dealerCard2, playerCard1, playerCard2);
-      });
     }, 500);
     var defaults = {
       //Confetti
@@ -608,7 +546,7 @@ betButton.addEventListener("click", () => {
   }
 });
 
-function cardDisplay(cardSection) {
+function cardGenerator(cardSection) {
   //Randomized Card generator
   let random = Math.floor(Math.random() * 52);
   let card = cards[random];
@@ -618,6 +556,20 @@ function cardDisplay(cardSection) {
   }
   card.used = "used";
   cardSection.innerHTML = `${card.pattern} ${card.number}`;
+  return card;
+}
+
+function cardDisplay(){
+  const card = document.createElement("div");
+  card.style.height = "100px";
+  card.style.width = "75px";
+  card.style.fontSize = "1.5rem";
+  card.style.backgroundColor = "white";
+  card.style.border = "1px black solid";
+  card.style.display = "flex";
+  card.style.justifyContent = "center";
+  card.style.alignItems = "center";
+  card.style.borderRadius = "5px";
   return card;
 }
 
@@ -638,17 +590,25 @@ function cardValue(cardCollection) {
   return value;
 }
 
-function resetRound(dealerCardValue, playerCardValue, dealerCard1, dealerCard2, playerCard1, playerCard2){
-  dealerCardValue.remove();
-  dealerCard1.remove();
-  dealerCard2.remove();
-  playerCardValue.remove();
-  playerCard1.remove();
-  playerCard2.remove();
-  playerCards.length = 0;
-  dealerCards.length = 0;
-  dealer.innerHTML = `<h2>Dealer's Cards</h2>
-            <div id="dealer-value" style="width: 100%;"></div>`;
+function resetRound(){
+  playerCards = [];
+  dealerCards = [];
+  console.log("start");
+  pCardContainer.innerHTML = '';
+  dCardContainer.innerHTML = '';
+  pValue.innerHTML = '';
+  dValue.innerHTML = '';
+  playCardShuffling();
+  const history = document.createElement("div");
+  if(chipsWon === 0){
+    history.innerHTML = `↘ Lost ......$${betInput.valueAsNumber}`;
+  }
+  else if(chipsWon === betInput.valueAsNumber){
+    history.innerHTML = `🔁 Push ...... $${chipsWon}`;
+  }
+  else
+    history.innerHTML = `↗ Won ...... $${chipsWon}`;
+  gameHistory.appendChild(history);
   result.innerText = `Place Your Bet`;
   chipsWon = 0;
   cards.forEach((item) => {
@@ -656,4 +616,38 @@ function resetRound(dealerCardValue, playerCardValue, dealerCard1, dealerCard2, 
   });
   bettingSection.classList.toggle("hidden");
   nextRound.classList.add("hidden");
+  if(balance <= 0){
+    balanceHeading.innerHTML = `GAME OVER!!!`;
+    playZeroBalance();
+    return;
+  }
 }
+
+function playChipsSound(){
+  const audio = new Audio('poker_chips.mp3'); 
+  audio.playbackRate = 4; 
+  audio.play();
+}
+
+function playCardShuffling(){
+  const audio = new Audio('card_shuffling.mp3'); 
+  audio.playbackRate = 4; 
+  audio.play();
+
+}
+function playCardDealing(){
+  const audio = new Audio('card_dealing.mp3'); 
+  audio.playbackRate = 4; 
+  audio.play();
+}
+function playZeroBalance(){
+  const audio = new Audio('lost.mp3'); 
+  audio.playbackRate = 4; 
+  audio.play();
+}
+function playJackpot(){
+  const audio = new Audio('jackpot.mp3'); 
+  audio.playbackRate = 1.5; 
+  audio.play();
+}
+

@@ -64,8 +64,28 @@ body {
     background: #e3d3f8;
     flex: 1 1 100%; 
     min-height: 120px; 
+    display: flex;
+    flex-flow: column nowrap;
+    overflow-y: auto;      
+    max-height: 90vh;
+    justify-content: flex-start;
+}
+#game-history > div{
+    height: 40px;
+    border-radius: 5px;
+    background-image: linear-gradient(to right, blue, black);
+    color: white;
+    line-height: 40px;
+    text-align: center;
 }
 
+#game-history > h2{
+    position: sticky;
+    top: 0;
+    background: #e3d3f8;
+    z-index: 1;
+    padding: 8px 0;
+}
 #betting{
     display: flex;
     gap: 10px;
@@ -90,4 +110,16 @@ h2 {
 
 #round-end{
     cursor: pointer;
+}
+
+#player-value, #dealer-value{
+    width: 100%;
+    text-align: center;
+    margin: 0;
+}
+
+#pcard-container, #dcard-container{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }
