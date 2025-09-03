@@ -448,6 +448,7 @@ betButton.addEventListener("click", () => {
         dValue.innerHTML = `DEALER BUST!!!`;
         chipsWon = betInput.valueAsNumber * 2;
         balance += chipsWon;
+        playConfetti();
         confetti({
           particleCount: 50,
           spread: 200,
@@ -465,6 +466,7 @@ betButton.addEventListener("click", () => {
         //Win condition #2 (Point difference)
         chipsWon = betInput.valueAsNumber * 2;
         balance += chipsWon;
+        playConfetti();
         confetti({
           particleCount: 50,
           spread: 200,
@@ -525,7 +527,6 @@ betButton.addEventListener("click", () => {
     };
 
     function shoot() {
-      playConfetti();
       confetti({
         ...defaults,
         particleCount: 40,
